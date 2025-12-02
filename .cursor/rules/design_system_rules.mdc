@@ -1,0 +1,719 @@
+# Design System Rules for Figma MCP Integration
+
+This document defines the design system structure and rules for integrating Figma designs into this Next.js + Tailwind CSS project.
+
+## 📋 Table of Contents
+
+- [Design Token Structure](#design-token-structure)
+- [Token Definitions](#token-definitions)
+- [Component Library](#component-library)
+- [Frameworks & Libraries](#frameworks--libraries)
+- [Asset Management](#asset-management)
+- [Icon System](#icon-system)
+- [Styling Approach](#styling-approach)
+- [Project Structure](#project-structure)
+- [Figma Integration Workflow](#figma-integration-workflow)
+
+---
+
+## Design Token Structure
+
+### Token Storage Locations
+
+Design tokens are stored in multiple locations for different purposes:
+
+1. **Source of Truth**: `src/tokens/figma-tokens.json`
+   - Raw JSON format extracted from Figma
+   - Contains all design tokens in their original structure
+   - Source URL and extraction metadata included
+
+2. **TypeScript Exports**: `src/tokens/index.ts`
+   - Type-safe TypeScript exports
+   - Provides `figmaTokens` object with proper typing
+   - Exports TypeScript types: `FigmaColors`, `FigmaTypography`
+
+3. **Tailwind Configuration**: `tailwind.config.js`
+   - Mapped to Tailwind theme extensions
+   - Used directly in component classes
+   - Includes responsive variants (desktop/mobile)
+
+### Token Format Structure
+
+```typescript
+// src/tokens/index.ts structure
+export const figmaTokens = {
+  colors: {
+    black: '#000000',
+    green: '#B9FF66',
+    white: '#ffffff',
+    dark: '#191A23',
+    grey: '#F3F3F3',
+    placeholder: '#898989',
+  },
+  typography: {
+    desktop: {
+      h1: { family, style, size, weight, lineHeight },
+      h2: { family, style, size, weight, lineHeight },
+      h3: { family, style, size, weight, lineHeight },
+      h4: { family, style, size, weight, lineHeight },
+      p: { family, style, size, weight, lineHeight },
+    },
+    mobile: {
+      // Same structure with mobile-specific values
+    },
+  },
+} as const;
+```
+
+### Token Transformation System
+
+Tokens flow through this transformation pipeline:
+
+1. **Figma Variables** → Extracted via Figma MCP Desktop
+2. **JSON Tokens** → Stored in `figma-tokens.json`
+3. **TypeScript Tokens** → Exported from `index.ts`
+4. **Tailwind Config** → Mapped to Tailwind theme extensions
+5. **Component Usage** → Used via Tailwind classes
+
+---
+
+## Token Definitions
+
+### Color Tokens
+
+**Figma Source Variables:**
+- `Black`: `#000000`
+- `Green`: `#B9FF66`
+- `White`: `#ffffff`
+- `Dark`: `#191A23`
+- `Grey`: `#F3F3F3`
+- `Placeholder`: `#898989`
+
+**Tailwind Mapping:**
+```javascript
+// tailwind.config.js
+colors: {
+  'black': '#000000',
+  'green': '#B9FF66',
+  'white': '#ffffff',
+  'dark': '#191A23',
+  'grey': '#F3F3F3',
+  'placeholder': '#898989',
+  // Legacy aliases for backward compatibility
+  'dark-charcoal': '#191A23',
+}
+```
+
+**Usage in Components:**
+```tsx
+// Use Tailwind color classes
+<div className="bg-dark text-white">...</div>
+<button className="bg-green text-black">...</button>
+```
+
+### Typography Tokens
+
+**Font Family:**
+- Primary: `Space Grotesk` (Google Font)
+- Configured in `src/app/layout.tsx` with Next.js font optimization
+- CSS variable: `--font-space-grotesk`
+- Tailwind class: `font-space-grotesk`
+
+**Desktop Typography Scale:**
+
+| Token | Size | Weight | Line Height | Tailwind Class |
+|-------|------|--------|-------------|----------------|
+| h1 | 60px | 500 | 100% | `text-h1` |
+| h2 | 40px | 500 | 100% | `text-h2` |
+| h3 | 30px | 500 | 100% | `text-h3` |
+| h4 | 20px | 500 | 100% | `text-h4` |
+| p | 18px | 400 | 100% | `text-p` |
+
+**Mobile Typography Scale:**
+
+| Token | Size | Weight | Line Height | Tailwind Class |
+|-------|------|--------|-------------|----------------|
+| h1-mob | 43px | 500 | 100% | `text-h1-mob` |
+| h2-mob | 36px | 500 | 100% | `text-h2-mob` |
+| h3-mob | 26px | 500 | 100% | `text-h3-mob` |
+| h4-mob | 18px | 500 | 100% | `text-h4-mob` |
+| p-mob | 16px | 400 | 24px | `text-p-mob` |
+
+**Tailwind Typography Configuration:**
+```javascript
+// tailwind.config.js
+fontSize: {
+  'h1': ['60px', { lineHeight: '100%', fontWeight: '500' }],
+  'h2': ['40px', { lineHeight: '100%', fontWeight: '500' }],
+  'h3': ['30px', { lineHeight: '100%', fontWeight: '500' }],
+  'h4': ['20px', { lineHeight: '100%', fontWeight: '500' }],
+  'p': ['18px', { lineHeight: '100%', fontWeight: '400' }],
+  // Mobile variants
+  'h1-mob': ['43px', { lineHeight: '100%', fontWeight: '500' }],
+  'h2-mob': ['36px', { lineHeight: '100%', fontWeight: '500' }],
+  'h3-mob': ['26px', { lineHeight: '100%', fontWeight: '500' }],
+  'h4-mob': ['18px', { lineHeight: '100%', fontWeight: '500' }],
+  'p-mob': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+}
+```
+
+**Usage in Components:**
+```tsx
+// Desktop typography
+<h1 className="font-space-grotesk text-h1">Heading 1</h1>
+<p className="font-space-grotesk text-p">Paragraph text</p>
+
+// Responsive typography (mobile-first)
+<h1 className="text-h1-mob sm:text-h1">Responsive Heading</h1>
+```
+
+### Spacing Tokens
+
+**Component-Specific Spacing:**
+```javascript
+// tailwind.config.js
+spacing: {
+  'header-padding-x': '100px',
+  'header-content-gap': '35px',
+  'header-button-padding-x': '35px',
+  'header-button-padding-y': '20px',
+}
+```
+
+**Usage:**
+```tsx
+<div className="px-header-padding-x gap-header-content-gap">
+  <button className="px-header-button-padding-x py-header-button-padding-y">
+    Button
+  </button>
+</div>
+```
+
+### Border Radius Tokens
+
+```javascript
+// tailwind.config.js
+borderRadius: {
+  'header-button': '14px',
+}
+```
+
+**Usage:**
+```tsx
+<button className="rounded-header-button">Button</button>
+```
+
+### Width Tokens
+
+```javascript
+// tailwind.config.js
+width: {
+  'header-title': '531px',
+  'header-description': '498px',
+}
+```
+
+---
+
+## Component Library
+
+### Component Architecture
+
+**Location**: `src/components/`
+
+**Naming Convention:**
+- File names: PascalCase (e.g., `Button.tsx`, `Header.tsx`)
+- Component names: PascalCase matching file name
+- Default exports for components
+
+**Component Structure Template:**
+```tsx
+import React from 'react';
+
+export default function ComponentName({ 
+  children, 
+  ...props 
+}: React.HTMLAttributes<HTMLElement>) {
+  return (
+    <element
+      className="tailwind-classes-here"
+      {...props}
+    >
+      {children}
+    </element>
+  );
+}
+```
+
+### Component Documentation
+
+**Storybook Integration:**
+- Story files co-located with components: `ComponentName.stories.tsx`
+- Stories defined using Storybook 10.0.8 format
+- Located in same directory as component
+
+**Example Story Structure:**
+```tsx
+// Button.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import Button from './Button';
+
+const meta: Meta<typeof Button> = {
+  title: 'Components/Button',
+  component: Button,
+};
+
+export default meta;
+type Story = StoryObj<typeof Button>;
+
+export const Default: Story = {
+  args: {
+    children: 'Button Text',
+  },
+};
+```
+
+### Component Patterns
+
+**Button Component Example:**
+```tsx
+// src/components/Button.tsx
+import React from 'react';
+
+export default function Button({ 
+  children, 
+  ...props 
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      className="bg-dark-charcoal disabled:bg-opacity-50 text-white font-space-grotesk text-xl leading-[28px] px-[35px] py-[20px] rounded-[14px] whitespace-nowrap w-full sm:w-auto"
+      {...props}
+    >
+      {children || "Book a consultation"}
+    </button>
+  );
+}
+```
+
+**Key Patterns:**
+- Use Tailwind utility classes for styling
+- Support responsive design with `sm:` breakpoints
+- Spread props for HTML attributes
+- Provide sensible defaults
+- Use TypeScript for type safety
+
+---
+
+## Frameworks & Libraries
+
+### Core Framework
+
+- **Next.js 15.5.6** - React framework with App Router
+  - File-based routing in `src/app/`
+  - Server and client components
+  - Built-in font optimization
+
+- **React 19.1.0** - UI library
+  - Functional components with hooks
+  - TypeScript support
+
+- **TypeScript 5** - Type-safe JavaScript
+  - Strict type checking
+  - Path aliases: `@/*` → `./src/*`
+
+### Styling Framework
+
+- **Tailwind CSS 3.2.6** - Utility-first CSS
+  - Configuration: `tailwind.config.js`
+  - Content paths: `./src/**/*.{tsx,ts,jsx,js}`, `.storybook/preview.tsx`
+  - Custom theme extensions for design tokens
+
+- **PostCSS** - CSS processing
+- **Autoprefixer** - Vendor prefixing
+
+### Development Tools
+
+- **Storybook 10.0.8** - Component development
+  - Configuration: `.storybook/`
+  - Preview: `.storybook/preview.tsx`
+  - Next.js integration: `@storybook/nextjs`
+
+### Typography
+
+- **Space Grotesk** - Google Font
+  - Weights: 400 (Regular), 500 (Medium)
+  - Loaded via Next.js font optimization
+  - CSS variable: `--font-space-grotesk`
+
+---
+
+## Asset Management
+
+### Asset Storage
+
+**Location**: `public/` directory
+
+**Structure:**
+```
+public/
+├── hero.svg
+└── [other assets]
+```
+
+### Asset Usage
+
+**Next.js Image Component:**
+```tsx
+import Image from 'next/image';
+import imgFrame from '/public/hero.svg';
+
+<Image src={imgFrame} alt="Description" className="w-full h-full" />
+```
+
+**Static Assets:**
+- Use Next.js `Image` component for optimization
+- Reference from `/public/` root
+- Support SVG, PNG, JPG formats
+
+### Asset Optimization
+
+- Next.js automatic image optimization
+- Lazy loading by default
+- Responsive image sizing
+
+---
+
+## Icon System
+
+### Icon Storage
+
+**Current Status**: Icons stored in `public/` directory
+
+### Icon Usage Patterns
+
+**SVG Icons:**
+```tsx
+import Image from 'next/image';
+import iconPath from '/public/icon.svg';
+
+<Image src={iconPath} alt="Icon" width={24} height={24} />
+```
+
+### Icon Naming Convention
+
+- Use descriptive names: `icon-name.svg`
+- Store in `public/icons/` (recommended structure)
+- Use kebab-case for file names
+
+---
+
+## Styling Approach
+
+### CSS Methodology
+
+**Tailwind CSS Utility-First:**
+- All styling via Tailwind utility classes
+- No CSS Modules or Styled Components
+- Global styles only in `src/app/globals.css`
+
+### Global Styles
+
+**Location**: `src/app/globals.css`
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+}
+
+body {
+  font-family: var(--font-space-grotesk);
+}
+```
+
+### Responsive Design
+
+**Breakpoint Strategy:**
+- Mobile-first approach
+- Default: Mobile styles
+- `sm:` prefix for desktop (640px+)
+
+**Example:**
+```tsx
+<div className="flex-col sm:flex-row">
+  <h1 className="text-h1-mob sm:text-h1">Responsive Heading</h1>
+</div>
+```
+
+### Component Styling Patterns
+
+**Inline Tailwind Classes:**
+```tsx
+<div className="bg-dark text-white px-5 py-10 rounded-lg">
+  Content
+</div>
+```
+
+**Responsive Classes:**
+```tsx
+<div className="w-full sm:w-auto px-5 sm:px-header-padding-x">
+  Content
+</div>
+```
+
+---
+
+## Project Structure
+
+### Directory Organization
+
+```
+app-figma-mcp/
+├── .cursor/
+│   └── rules/
+│       └── design_system_rules.mdc    # This file
+├── .storybook/
+│   └── preview.tsx                     # Storybook config
+├── public/
+│   └── [assets]                       # Static assets
+├── src/
+│   ├── app/                           # Next.js App Router
+│   │   ├── layout.tsx                 # Root layout
+│   │   ├── page.tsx                   # Home page
+│   │   ├── globals.css                # Global styles
+│   │   └── favicon.ico
+│   ├── components/                    # React components
+│   │   ├── Button.tsx
+│   │   ├── Button.stories.tsx
+│   │   ├── Header.tsx
+│   │   └── [ComponentName].tsx
+│   └── tokens/                        # Design tokens
+│       ├── figma-tokens.json          # Raw JSON tokens
+│       └── index.ts                   # TypeScript exports
+├── tailwind.config.js                 # Tailwind configuration
+├── tsconfig.json                      # TypeScript config
+├── next.config.ts                     # Next.js config
+└── package.json                       # Dependencies
+```
+
+### Path Aliases
+
+**TypeScript Configuration:**
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+**Usage:**
+```tsx
+import Button from '@/components/Button';
+import { figmaTokens } from '@/tokens';
+```
+
+### Feature Organization
+
+**Current Pattern:**
+- Flat component structure in `src/components/`
+- Co-located stories with components
+- Feature-specific folders (e.g., `case-studies/`) for related components
+
+---
+
+## Figma Integration Workflow
+
+### Step 1: Extract Design Tokens from Figma
+
+**Using Figma MCP Desktop:**
+
+1. Get Figma variable definitions:
+   ```typescript
+   // Use mcp_Figma_Desktop_get_variable_defs
+   // nodeId format: "25:145" (from URL node-id=25-145)
+   ```
+
+2. Extract design context:
+   ```typescript
+   // Use mcp_Figma_Desktop_get_design_context
+   // Provides component structure and styling
+   ```
+
+### Step 2: Update Token Files
+
+**Update `src/tokens/figma-tokens.json`:**
+```json
+{
+  "colors": {
+    "Black": "#000000",
+    "Green": "#B9FF66",
+    // ... other colors
+  },
+  "typography": {
+    "desktop": { /* ... */ },
+    "mobile": { /* ... */ }
+  },
+  "source": {
+    "figmaUrl": "https://figma.com/...",
+    "extractedAt": "2024-12-19",
+    "extractedVia": "Figma MCP Desktop"
+  }
+}
+```
+
+**Update `src/tokens/index.ts`:**
+- Sync TypeScript exports with JSON structure
+- Maintain type safety with `as const`
+- Export types for component usage
+
+### Step 3: Map Tokens to Tailwind
+
+**Update `tailwind.config.js`:**
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        // Map Figma color variables
+        'black': '#000000',
+        'green': '#B9FF66',
+        // ...
+      },
+      fontSize: {
+        // Map Figma typography tokens
+        'h1': ['60px', { lineHeight: '100%', fontWeight: '500' }],
+        // ...
+      },
+      // Add spacing, borderRadius, etc.
+    },
+  },
+};
+```
+
+### Step 4: Create Component from Figma Design
+
+**Component Creation Process:**
+
+1. **Extract Design Context:**
+   - Use `mcp_Figma_Desktop_get_design_context` with node ID
+   - Analyze structure, colors, typography, spacing
+
+2. **Create Component File:**
+   ```tsx
+   // src/components/NewComponent.tsx
+   import React from 'react';
+   
+   export default function NewComponent({ children, ...props }) {
+     return (
+       <div className="tailwind-classes-from-figma">
+         {children}
+       </div>
+     );
+   }
+   ```
+
+3. **Map Figma Styles to Tailwind:**
+   - Colors → Tailwind color classes
+   - Typography → Tailwind text size classes
+   - Spacing → Tailwind spacing utilities
+   - Layout → Tailwind flex/grid utilities
+
+4. **Create Storybook Story:**
+   ```tsx
+   // src/components/NewComponent.stories.tsx
+   import type { Meta, StoryObj } from '@storybook/react';
+   import NewComponent from './NewComponent';
+   
+   const meta: Meta<typeof NewComponent> = {
+     title: 'Components/NewComponent',
+     component: NewComponent,
+   };
+   
+   export default meta;
+   type Story = StoryObj<typeof NewComponent>;
+   
+   export const Default: Story = {};
+   ```
+
+### Step 5: Responsive Design Mapping
+
+**Desktop vs Mobile:**
+- Use mobile tokens as default
+- Apply desktop tokens with `sm:` prefix
+- Example: `text-h1-mob sm:text-h1`
+
+### Step 6: Asset Extraction
+
+**Images and Icons:**
+1. Extract assets via Figma MCP
+2. Save to `public/` directory
+3. Use Next.js `Image` component
+4. Reference from `/public/` path
+
+---
+
+## Best Practices
+
+### Token Management
+
+1. **Single Source of Truth**: Always update `figma-tokens.json` first
+2. **Type Safety**: Keep TypeScript exports in sync
+3. **Tailwind Mapping**: Map all tokens to Tailwind config
+4. **Documentation**: Update this file when adding new tokens
+
+### Component Development
+
+1. **Use Design Tokens**: Always use token-based Tailwind classes
+2. **Responsive First**: Mobile-first responsive design
+3. **TypeScript**: Full type safety for props
+4. **Storybook**: Create stories for all components
+5. **Accessibility**: Include proper ARIA attributes
+
+### Figma Integration
+
+1. **Node ID Format**: Convert URL format (`25-145`) to tool format (`25:145`)
+2. **Variable Extraction**: Always extract variables first
+3. **Design Context**: Use design context for component structure
+4. **Token Sync**: Keep tokens synchronized with Figma
+5. **Version Control**: Track token changes in git
+
+### Code Quality
+
+1. **Consistent Naming**: Follow established naming conventions
+2. **Component Props**: Use HTML attribute spreading
+3. **Default Values**: Provide sensible defaults
+4. **Documentation**: Comment complex logic
+5. **Testing**: Use Storybook for visual testing
+
+---
+
+## Figma Source
+
+**Design File:**
+- URL: `https://www.figma.com/design/r0J523hnCWW51EkP8r13I0/Positivus-Landing-Page-Design--Community-`
+- Node ID: `25:145` (from URL `node-id=25-145`)
+
+**Extracted Variables:**
+- Colors: Black, Green, White, Dark, Grey, Placeholder
+- Typography: h1, h2, h3, h4, p (desktop and mobile variants)
+
+---
+
+## Summary
+
+This design system provides:
+
+✅ **Structured token management** across JSON, TypeScript, and Tailwind  
+✅ **Component architecture** with Storybook integration  
+✅ **Figma MCP workflow** for seamless design-to-code translation  
+✅ **Responsive design patterns** with mobile-first approach  
+✅ **Type-safe development** with TypeScript  
+✅ **Consistent styling** via Tailwind utility classes  
+
+Follow these rules when integrating new designs from Figma to maintain consistency and quality across the codebase.

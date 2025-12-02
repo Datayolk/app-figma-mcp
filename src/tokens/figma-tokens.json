@@ -1,0 +1,92 @@
+{
+  "colors": {
+    "Black": "#000000",
+    "Green": "#B9FF66",
+    "White": "#ffffff",
+    "Dark": "#191A23",
+    "Grey": "#F3F3F3",
+    "Placeholder": "#898989"
+  },
+  "typography": {
+    "desktop": {
+      "h1": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 60,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h2": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 40,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h3": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 30,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h4": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 20,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "p": {
+        "family": "Space Grotesk",
+        "style": "Regular",
+        "size": 18,
+        "weight": 400,
+        "lineHeight": 100
+      }
+    },
+    "mobile": {
+      "h1": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 43,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h2": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 36,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h3": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 26,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "h4": {
+        "family": "Space Grotesk",
+        "style": "Medium",
+        "size": 18,
+        "weight": 500,
+        "lineHeight": 100
+      },
+      "p": {
+        "family": "Space Grotesk",
+        "style": "Regular",
+        "size": 16,
+        "weight": 400,
+        "lineHeight": 24
+      }
+    }
+  },
+  "source": {
+    "figmaUrl": "https://www.figma.com/design/r0J523hnCWW51EkP8r13I0/Positivus-Landing-Page-Design--Community-?node-id=25-145&m=dev",
+    "extractedAt": "2024-12-19",
+    "extractedVia": "Figma MCP Desktop"
+  }
+}
+
